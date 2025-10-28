@@ -22,9 +22,23 @@ ENDCLASS.
 
 CLASS zcl_bs_demo_ide_first_action IMPLEMENTATION.
   METHOD if_aia_action~run.
-*    result = output_text( ).
-*    result = output_html( ).
-    result = output_code_change( context ).
+    DATA input TYPE zcl_bs_demo_ide_first_input=>input.
+
+    TRY.
+        context->get_input_config_content( )->get_as_structure( IMPORTING result = input ).
+      CATCH cx_sd_invalid_data.
+    ENDTRY.
+
+    CASE input-output_format.
+      WHEN zcl_bs_demo_ide_first_input=>output_enum-text.
+        result = output_text( ).
+
+      WHEN zcl_bs_demo_ide_first_input=>output_enum-html.
+        result = output_html( ).
+
+      WHEN zcl_bs_demo_ide_first_input=>output_enum-code.
+        result = output_code_change( context ).
+    ENDCASE.
   ENDMETHOD.
 
 
@@ -66,6 +80,7 @@ CLASS zcl_bs_demo_ide_first_action IMPLEMENTATION.
 
   METHOD demo_method_with_code.
     " Dummy comment
+    " TODO: variable is assigned but never used (ABAP cleaner)
     DATA(dummy) = `Some Dummy Code`.
   ENDMETHOD.
 ENDCLASS.
