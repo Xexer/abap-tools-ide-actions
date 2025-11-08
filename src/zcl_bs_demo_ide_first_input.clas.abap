@@ -24,6 +24,12 @@ CLASS zcl_bs_demo_ide_first_input DEFINITION
       BEGIN OF input,
         "! <p class="shorttext">Choose an output</p>
         output_format TYPE output_format,
+        "! <p class="shorttext">VH: Class</p>
+        vh_class      TYPE string,
+        "! <p class="shorttext">VH: Method</p>
+        vh_method     TYPE string,
+        "! <p class="shorttext">VH: Parameter</p>
+        vh_parameter  TYPE string,
       END OF input.
 ENDCLASS.
 
@@ -32,8 +38,18 @@ CLASS zcl_bs_demo_ide_first_input IMPLEMENTATION.
   METHOD if_aia_sd_action_input~create_input_config.
     DATA input TYPE input.
 
-    input-output_format = 'TEST'.
+    DATA(configuration) = ui_information_factory->get_configuration_factory( )->create_for_data( input ).
 
-    RETURN ui_information_factory->for_abap_type( abap_type = input ).
+    configuration->get_element( `vh_class` )->set_types( VALUE #( ( `CLAS/OC` ) ) ).
+    configuration->get_element( 'vh_method' )->set_values( if_sd_config_element=>values_kind-domain_specific_named_items ).
+    configuration->get_element( 'vh_parameter' )->set_values( if_sd_config_element=>values_kind-domain_specific_named_items ).
+
+    RETURN ui_information_factory->for_abap_type( abap_type     = input
+                                                  configuration = configuration ).
+  ENDMETHOD.
+
+
+  METHOD if_aia_sd_action_input~get_value_help_provider.
+    result = cl_sd_value_help_provider=>create( NEW zcl_bs_demo_ide_first_value( ) ).
   ENDMETHOD.
 ENDCLASS.
