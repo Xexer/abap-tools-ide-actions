@@ -30,6 +30,10 @@ CLASS zcl_bs_demo_ide_first_input DEFINITION
         vh_method     TYPE string,
         "! <p class="shorttext">VH: Parameter</p>
         vh_parameter  TYPE string,
+        "! <p class="shorttext">SE: Input</p>
+        se_input      TYPE string,
+        "! <p class="shorttext">SE: Output</p>
+        se_output     TYPE string,
       END OF input.
 ENDCLASS.
 
@@ -42,7 +46,11 @@ CLASS zcl_bs_demo_ide_first_input IMPLEMENTATION.
 
     configuration->get_element( `vh_class` )->set_types( VALUE #( ( `CLAS/OC` ) ) ).
     configuration->get_element( 'vh_method' )->set_values( if_sd_config_element=>values_kind-domain_specific_named_items ).
-    configuration->get_element( 'vh_parameter' )->set_values( if_sd_config_element=>values_kind-domain_specific_named_items ).
+    configuration->get_element( 'vh_parameter' )->set_values(
+        if_sd_config_element=>values_kind-domain_specific_named_items ).
+
+    configuration->get_element( `output_format` )->set_sideeffect( after_update = abap_true ).
+    configuration->get_element( `se_input` )->set_sideeffect( after_update = abap_true ).
 
     RETURN ui_information_factory->for_abap_type( abap_type     = input
                                                   configuration = configuration ).
@@ -51,5 +59,10 @@ CLASS zcl_bs_demo_ide_first_input IMPLEMENTATION.
 
   METHOD if_aia_sd_action_input~get_value_help_provider.
     result = cl_sd_value_help_provider=>create( NEW zcl_bs_demo_ide_first_value( ) ).
+  ENDMETHOD.
+
+
+  METHOD if_aia_sd_action_input~get_side_effect_provider.
+    RETURN cl_sd_sideeffect_provider=>create( determination = NEW zcl_bs_demo_ide_first_side( ) ).
   ENDMETHOD.
 ENDCLASS.
